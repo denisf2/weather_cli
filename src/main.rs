@@ -1,12 +1,27 @@
 use std::env;
 
-fn main() {
+fn print_cli_help() {
     // write using help
-    println!("pass as arguments city and country code");
-    println!("example: London UK");
-    
+    println!("Getting forcast\r\n");
+    println!("Usage:\r\n\tpass as arguments city and country code");
+    println!("\texample: London UK");
+}
+
+fn main() {
     // get cli args
     let args = env::args().collect::<Vec<String>>();
+    dbg!(&args);
 
-    dbg!(args);
+    if args.len() < 2 {
+        print_cli_help();
+    }
 }
+
+// #[cfg(test)]
+// mod tests {
+//     #[test]
+//     fn it_works() {
+//         let result = 2 + 2;
+//         assert_eq!(result, 4);
+//     }
+// }
