@@ -4,7 +4,7 @@ fn print_cli_help() {
     // write using help
     println!("Getting forcast\r\n");
     println!("Usage:\r\n\tpass as arguments city and country code");
-    println!("\texample: London UK");
+    println!("\texample: London GB");
 }
 
 fn main() {
