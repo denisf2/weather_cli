@@ -2,11 +2,11 @@ use serde::{Deserialize, Serialize};
 
 
 /// get coordinates
-pub type Root = Vec<Root2>;
+pub type CoordsVec = Vec<CityCoord>;
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Root2 {
+pub struct CityCoord {
     pub name: String,
     #[serde(rename = "local_names")]
     pub local_names: LocalNames,
@@ -173,7 +173,7 @@ pub struct LocalNames {
 /// get forecast
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Root3 {
+pub struct Forecast {
     pub coord: Coord,
     pub weather: Vec<Weather>,
     pub base: String,

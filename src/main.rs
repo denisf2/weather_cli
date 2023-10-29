@@ -7,7 +7,7 @@ use exitfailure::ExitFailure;
 use reqwest::Url;
 use std::env;
 
-use crate::openweathermap::{Root, Root3};
+use crate::openweathermap::{CoordsVec, Forecast};
 
 fn print_cli_help() {
     // write using help
@@ -29,13 +29,13 @@ async fn get_coords(
     let url = Url::parse(&url)?;
     // dbg!(&url);
 
-    let resp = reqwest::get(url).await?.json::<Root>().await?;
+    let resp = reqwest::get(url).await?.json::<CoordsVec>().await?;
     // dbg!(&resp);
 
-    Ok((resp[0].lat,resp[0].lon))
+    Ok((resp[0].lat, resp[0].lon))
 }
 
-async fn get_forcast(coord: (f64, f64), api_key: &str) -> Result<Root3, ExitFailure> {
+async fn get_forcast(coord: (f64, f64), api_key: &str) -> Result<Forecast, ExitFailure> {
     let url = format!(
         "https://api.openweathermap.org/data/2.5/weather?lat={}&lon={}&appid={api_key}&units=metric",
         coord.0, coord.1
@@ -43,7 +43,7 @@ async fn get_forcast(coord: (f64, f64), api_key: &str) -> Result<Root3, ExitFail
     // dbg!(&url);
     let url = Url::parse(&url)?;
     // dbg!(&url);
-    let resp = reqwest::get(url).await?.json::<Root3>().await?;
+    let resp = reqwest::get(url).await?.json::<Forecast>().await?;
     // dbg!(&resp);
 
     Ok(resp)
