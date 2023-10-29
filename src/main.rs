@@ -49,6 +49,15 @@ async fn get_forcast(coord: (f64, f64), api_key: &str) -> Result<Forecast, ExitF
     Ok(resp)
 }
 
+
+fn print_forecast(args: &[String], forecast: Forecast) {
+    println!(
+        "Temperature in {} {} is {:?}°C",
+        args[1], args[2], forecast.main.temp
+    );
+}
+
+
 #[tokio::main]
 async fn main() -> Result<(), ExitFailure> {
     // get cli args
@@ -73,7 +82,7 @@ async fn main() -> Result<(), ExitFailure> {
     let forecast = get_forcast(coord, api_key).await?;
 
     // print forecast
-    println!("Temperature in {} {} is {:?}°C", args[1], args[2], forecast.main.temp);
+    print_forecast(args.as_slice(), forecast);
 
     Ok(())
 }
