@@ -5,7 +5,9 @@ mod openweathermap;
 
 use exitfailure::ExitFailure;
 use reqwest::Url;
-use std::env;
+use std::io::Read;
+use std::path::Path;
+use std::{env, fs::File};
 
 use crate::openweathermap::{CoordsVec, Forecast};
 
@@ -49,6 +51,15 @@ async fn get_forcast(coord: (f64, f64), api_key: &str) -> Result<Forecast, ExitF
     Ok(resp)
 }
 
+async fn get_api_key(path: &str) -> Result<String, ExitFailure> {
+    let path = Path::new(path);
+
+    let mut file = File::open(&path)?;
+    let mut s = String::new();
+    let _ = file.read_to_string(&mut s)?;
+
+    Ok(s)
+}
 
 fn print_forecast(args: &[String], forecast: Forecast) {
     println!(
@@ -64,6 +75,7 @@ async fn main() -> Result<(), ExitFailure> {
     let args = env::args().collect::<Vec<String>>();
     // dbg!(&args);
 
+    //check cli arguments number
     if args.len() < 2 {
         print_cli_help();
 
@@ -72,14 +84,16 @@ async fn main() -> Result<(), ExitFailure> {
 
     let city_code = &args[1];
     let country_code = &args[2];
-    let api_key = &args[3];
+
+    // get api key from locale file
+    let api_key = get_api_key(&args[3]).await?;
 
     // get coordinate by city / country
-    let coord = get_coords(city_code.as_str(), country_code.as_str(), api_key).await?;
+    let coord = get_coords(city_code.as_str(), country_code.as_str(), api_key.as_str()).await?;
     // dbg!(&coord);
 
     // get forcast by coordinate
-    let forecast = get_forcast(coord, api_key).await?;
+    let forecast = get_forcast(coord, api_key.as_str()).await?;
 
     // print forecast
     print_forecast(args.as_slice(), forecast);
