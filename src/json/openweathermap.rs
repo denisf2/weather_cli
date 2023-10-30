@@ -9,7 +9,7 @@ pub type CoordsVec = Vec<CityCoord>;
 pub struct CityCoord {
     pub name: String,
     #[serde(rename = "local_names")]
-    pub local_names: LocalNames,
+    pub local_names: Option<LocalNames>,
     pub lat: f64,
     pub lon: f64,
     pub country: String,
