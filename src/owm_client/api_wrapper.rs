@@ -3,6 +3,9 @@ use super::json_structs::{CoordsVec, Forecast};
 use exitfailure::ExitFailure;
 use reqwest::Url;
 
+const GEO_API: &str = "https://api.openweathermap.org/geo/1.0/direct";
+const WEATHER_API: &str = "https://api.openweathermap.org/data/2.5/weather";
+
 pub async fn get_coords(
     city_name: &str,
     country_code: &str,
@@ -10,9 +13,11 @@ pub async fn get_coords(
 ) -> Result<(f64, f64), ExitFailure> {
     println!("->> {:<12} - get_coords", "OPENWEATHERMAP");
 
-    let state_code = String::new();
+    let state_code = "";
     let limit = 3;
-    let url = format!("https://api.openweathermap.org/geo/1.0/direct?q={city_name},{state_code},{country_code}&limit={limit}&appid={api_key}");
+    let url = format!(
+        "{GEO_API}?q={city_name},{state_code},{country_code}&limit={limit}&appid={api_key}"
+    );
     // dbg!(&url);
 
     let url = Url::parse(&url)?;
@@ -26,9 +31,10 @@ pub async fn get_coords(
 
 pub async fn get_forcast(coord: (f64, f64), api_key: &str) -> Result<Forecast, ExitFailure> {
     println!("->> {:<12} - get_forcast", "OPENWEATHERMAP");
-
+    
+    let units = "metric";
     let url = format!(
-        "https://api.openweathermap.org/data/2.5/weather?lat={}&lon={}&appid={api_key}&units=metric",
+        "{WEATHER_API}?lat={}&lon={}&appid={api_key}&units={units}",
         coord.0, coord.1
     );
 
