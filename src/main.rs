@@ -1,15 +1,13 @@
 // #[warn(dead_code)]
 
-#[path = "./json/openweathermap.rs"]
-mod openweathermap;
+mod owm_client;
 
 use exitfailure::ExitFailure;
-use reqwest::Url;
 use std::io::Read;
 use std::path::Path;
 use std::{env, fs::File};
 
-use crate::openweathermap::{CoordsVec, Forecast};
+use owm_client::json_structs::Forecast;
 
 fn print_cli_help() {
     println!("->> {:<12} - print_cli_help", "HELP");
@@ -20,53 +18,15 @@ fn print_cli_help() {
     println!("\texample: London GB");
 }
 
-async fn get_coords(
-    city_name: &str,
-    country_code: &str,
-    api_key: &str,
-) -> Result<(f64, f64), ExitFailure> {
-    println!("->> {:<12} - get_coords", "OPENWEATHERMAP");
-
-    let state_code = String::new();
-    let limit = 3;
-    let url = format!("https://api.openweathermap.org/geo/1.0/direct?q={city_name},{state_code},{country_code}&limit={limit}&appid={api_key}");
-    // dbg!(&url);
-
-    let url = Url::parse(&url)?;
-    // dbg!(&url);
-
-    let resp = reqwest::get(url).await?.json::<CoordsVec>().await?;
-    // dbg!(&resp);
-
-    Ok((resp[0].lat, resp[0].lon))
-}
-
-async fn get_forcast(coord: (f64, f64), api_key: &str) -> Result<Forecast, ExitFailure> {
-    println!("->> {:<12} - get_forcast", "OPENWEATHERMAP");
-    
-    let url = format!(
-        "https://api.openweathermap.org/data/2.5/weather?lat={}&lon={}&appid={api_key}&units=metric",
-        coord.0, coord.1
-    );
-
-    // dbg!(&url);
-    let url = Url::parse(&url)?;
-    // dbg!(&url);
-    let resp = reqwest::get(url).await?.json::<Forecast>().await?;
-    // dbg!(&resp);
-    
-    Ok(resp)
-}
-
 async fn get_api_key(path: &str) -> Result<String, ExitFailure> {
     println!("->> {:<12} - get_api_key", "OPENWEATHERMAP");
-    
+
     let path = Path::new(path);
 
     let mut file = File::open(&path)?;
     let mut s = String::new();
     let _ = file.read_to_string(&mut s)?;
-    
+
     Ok(s)
 }
 
@@ -99,11 +59,11 @@ async fn main() -> Result<(), ExitFailure> {
     let api_key = get_api_key(&args[3]).await?;
 
     // get coordinate by city / country
-    let coord = get_coords(city_code.as_str(), country_code.as_str(), api_key.as_str()).await?;
+    let coord = owm_client::api_wrapper::get_coords(city_code.as_str(), country_code.as_str(), api_key.as_str()).await?;
     // dbg!(&coord);
 
     // get forcast by coordinate
-    let forecast = get_forcast(coord, api_key.as_str()).await?;
+    let forecast = owm_client::api_wrapper::get_forcast(coord, api_key.as_str()).await?;
 
     // print forecast
     print_forecast(args.as_slice(), forecast);
