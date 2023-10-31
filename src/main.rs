@@ -1,11 +1,10 @@
 // #[warn(dead_code)]
 
+mod app_settings;
 mod owm_client;
 
 use exitfailure::ExitFailure;
-use std::io::Read;
-use std::path::Path;
-use std::{env, fs::File};
+use std::env;
 
 use owm_client::json_structs::Forecast;
 
@@ -16,18 +15,6 @@ fn print_cli_help() {
     println!("Getting forcast\r\n");
     println!("Usage:\r\n\tpass as arguments city and country code");
     println!("\texample: London GB");
-}
-
-async fn get_api_key(path: &str) -> Result<String, ExitFailure> {
-    println!("->> {:<12} - get_api_key", "OPENWEATHERMAP");
-
-    let path = Path::new(path);
-
-    let mut file = File::open(&path)?;
-    let mut s = String::new();
-    let _ = file.read_to_string(&mut s)?;
-
-    Ok(s)
 }
 
 fn print_forecast(args: &[String], forecast: Forecast) {
@@ -56,10 +43,15 @@ async fn main() -> Result<(), ExitFailure> {
     let country_code = &args[2];
 
     // get api key from locale file
-    let api_key = get_api_key(&args[3]).await?;
+    let api_key = app_settings::get_api_key(&args[3]).await?;
 
     // get coordinate by city / country
-    let coord = owm_client::api_wrapper::get_coords(city_code.as_str(), country_code.as_str(), api_key.as_str()).await?;
+    let coord = owm_client::api_wrapper::get_coords(
+        city_code.as_str(),
+        country_code.as_str(),
+        api_key.as_str(),
+    )
+    .await?;
     // dbg!(&coord);
 
     // get forcast by coordinate
