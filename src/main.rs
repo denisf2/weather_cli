@@ -55,6 +55,10 @@ async fn main() -> Result<(), ExitFailure> {
     .await?;
     // dbg!(&coord);
 
+    // condition key to find forecast by local ip
+    let geo_coord = ip2geo_client::api_wrapper::get_coord(api_key.ip2geo_key.as_str());
+    dbg!(&geo_coord);
+
     // get forcast by coordinate
     let forecast = owm_client::api_wrapper::get_forcast(coord, api_key.owm_key.as_str()).await?;
 
