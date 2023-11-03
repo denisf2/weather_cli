@@ -1,6 +1,7 @@
 // #[warn(dead_code)]
 
 mod app_settings;
+mod ip2geo_client;
 mod owm_client;
 
 use exitfailure::ExitFailure;
@@ -42,20 +43,20 @@ async fn main() -> Result<(), ExitFailure> {
     let city_code = &args[1];
     let country_code = &args[2];
 
-    // get api key from locale file
-    let api_key = app_settings::get_api_key(&args[3]).await?;
+    // get api keys from locale file
+    let api_key = app_settings::get_api_keys(&args[3]).await?;
 
     // get coordinate by city / country
     let coord = owm_client::api_wrapper::get_coords(
         city_code.as_str(),
         country_code.as_str(),
-        api_key.as_str(),
+        api_key.owm_key.as_str(),
     )
     .await?;
     // dbg!(&coord);
 
     // get forcast by coordinate
-    let forecast = owm_client::api_wrapper::get_forcast(coord, api_key.as_str()).await?;
+    let forecast = owm_client::api_wrapper::get_forcast(coord, api_key.owm_key.as_str()).await?;
 
     // print forecast
     print_forecast(args.as_slice(), forecast);
