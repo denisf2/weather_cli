@@ -7,8 +7,8 @@ use std::net::IpAddr;
 const IP2GEO_API: &str = "https://api.ipgeolocation.io/ipgeo";
 #[derive(Debug)]
 pub struct Coord {
-    lat: f64,
-    lon: f64,
+    pub lat: f64,
+    pub lon: f64,
 }
 
 pub fn get_coord(api_key: &str) -> Coord {

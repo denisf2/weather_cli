@@ -4,66 +4,68 @@ mod app_settings;
 mod ip2geo_client;
 mod owm_client;
 
+use clap::Parser;
 use exitfailure::ExitFailure;
-use std::env;
-
 use owm_client::json_structs::Forecast;
 
-fn print_cli_help() {
-    println!("->> {:<12} - print_cli_help", "HELP");
+#[derive(Debug, Parser, Clone)]
+#[command(author, version, about, long_about = None)]
+struct CliArgs {
+    // City name
+    #[arg(short = 'C', long)]
+    city: Option<String>,
 
-    // write using help
-    println!("Getting forcast\r\n");
-    println!("Usage:\r\n\tpass as arguments city and country code");
-    println!("\texample: London GB");
+    // Country
+    #[arg(short = 'O', long)]
+    country: Option<String>,
+
+    // The path to the file to read
+    #[arg(short, long, value_name = "FILE")]
+    config: std::path::PathBuf,
 }
 
-fn print_forecast(args: &[String], forecast: Forecast) {
+fn print_forecast(city: &str, country: &str, forecast: Forecast) {
     println!("->> {:<12} - print_forecast", "OUTPUT");
 
     println!(
-        "Temperature in {} {} is {:?}°C",
-        args[1], args[2], forecast.main.temp
+        "Temperature in {city} {country} is {}°C",
+        forecast.main.temp
     );
 }
 
 #[tokio::main]
 async fn main() -> Result<(), ExitFailure> {
-    // get cli args
-    let args = env::args().collect::<Vec<String>>();
-    // dbg!(&args);
+    // get clap args
+    let cli = CliArgs::parse();
 
-    //check cli arguments number
-    if args.len() < 2 {
-        print_cli_help();
-
+    if !cli.config.exists() {
+        println!("File {} does not exist", cli.config.to_str().unwrap());
         return Ok(());
     }
 
-    let city_code = &args[1];
-    let country_code = &args[2];
-
     // get api keys from locale file
-    let api_key = app_settings::get_api_keys(&args[3]).await?;
+    let api_key = app_settings::get_api_keys(cli.config.as_path()).await?;
 
-    // get coordinate by city / country
-    let coord = owm_client::api_wrapper::get_coords(
-        city_code.as_str(),
-        country_code.as_str(),
-        api_key.owm_key.as_str(),
-    )
-    .await?;
-    // dbg!(&coord);
+    let coord = match (cli.city, cli.country) {
+        (Some(c), Some(co)) => {
+            // get coordinate by city / country
+            owm_client::api_wrapper::get_coords(c.as_str(), co.as_str(), api_key.owm_key.as_str())
+                .await?
+        }
 
-    // condition key to find forecast by local ip
-    let geo_coord = ip2geo_client::api_wrapper::get_coord(api_key.ip2geo_key.as_str());
-    dbg!(&geo_coord);
+        (_, _) => {
+            // condition key to find forecast by local ip
+            let c = ip2geo_client::api_wrapper::get_coord(api_key.ip2geo_key.as_str());
+            (c.lat, c.lon)
+        }
+    };
+    dbg!(&coord);
 
     // get forcast by coordinate
     let forecast = owm_client::api_wrapper::get_forcast(coord, api_key.owm_key.as_str()).await?;
 
     // print forecast
-    print_forecast(args.as_slice(), forecast);
+    print_forecast("city", "country", forecast);
 
     Ok(())
 }
