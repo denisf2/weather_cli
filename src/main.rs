@@ -38,7 +38,7 @@ async fn main() -> Result<(), ExitFailure> {
     // get clap args
     let cli = CliArgs::parse();
 
-    if !cli.config.exists() {
+    if !cli.config.is_file() {
         println!("File {} does not exist", cli.config.to_str().unwrap());
         return Ok(());
     }
