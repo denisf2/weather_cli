@@ -6,6 +6,7 @@ mod owm_client;
 
 use clap::Parser;
 use exitfailure::ExitFailure;
+use ip2geo_client::api_wrapper::Coord;
 use owm_client::json_structs::Forecast;
 
 #[derive(Debug, Parser, Clone)]
@@ -55,17 +56,20 @@ async fn main() -> Result<(), ExitFailure> {
 
         (_, _) => {
             // condition key to find forecast by local ip
-            let c = ip2geo_client::api_wrapper::get_coord(api_key.ip2geo_key.as_str());
-            (c.lat, c.lon)
+            let Coord { lat, lon } =
+                ip2geo_client::api_wrapper::get_coord(api_key.ip2geo_key.as_str());
+            owm_client::api_wrapper::get_city_info(lat, lon, &api_key.owm_key).await?
         }
     };
-    dbg!(&coord);
+    // dbg!(&coord);
 
     // get forcast by coordinate
-    let forecast = owm_client::api_wrapper::get_forcast(coord, api_key.owm_key.as_str()).await?;
+    let forecast =
+        owm_client::api_wrapper::get_forcast((coord.lat, coord.lon), api_key.owm_key.as_str())
+            .await?;
 
     // print forecast
-    print_forecast("city", "country", forecast);
+    print_forecast(&coord.city, &coord.country, forecast);
 
     Ok(())
 }
