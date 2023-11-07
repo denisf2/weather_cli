@@ -39,7 +39,7 @@ fn get_ip() -> IpAddr {
 
     let result = external_ip::get_ip();
     let value: Option<IpAddr> = block_on(result);
-    dbg!(&value);
+    // dbg!(&value);
 
     value.unwrap()
 }
