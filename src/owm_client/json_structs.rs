@@ -13,7 +13,7 @@ pub struct CityCoord {
     pub lat: f64,
     pub lon: f64,
     pub country: String,
-    pub state: String,
+    pub state: Option<String>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
