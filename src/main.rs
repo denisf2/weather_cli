@@ -25,12 +25,12 @@ struct CliArgs {
     config: std::path::PathBuf,
 }
 
-fn print_forecast(city: &str, country: &str, forecast: Forecast) {
+fn print_forecast(forecast: Forecast) {
     println!("->> {:<12} - print_forecast", "OUTPUT");
 
     println!(
-        "Temperature in {city} {country} is {}°C",
-        forecast.main.temp
+        "Temperature in {} {} is {}°C",
+        forecast.name, forecast.sys.country, forecast.main.temp
     );
 }
 
@@ -67,9 +67,10 @@ async fn main() -> Result<(), ExitFailure> {
     let forecast =
         owm_client::api_wrapper::get_forcast((coord.lat, coord.lon), api_key.owm_key.as_str())
             .await?;
+    // dbg!(&forecast);
 
     // print forecast
-    print_forecast(&coord.city, &coord.country, forecast);
+    print_forecast(forecast);
 
     Ok(())
 }
