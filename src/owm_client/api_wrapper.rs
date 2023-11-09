@@ -5,17 +5,17 @@ use reqwest::Url;
 
 const GEO_API: &str = "https://api.openweathermap.org/geo/1.0/direct";
 const WEATHER_API: &str = "https://api.openweathermap.org/data/2.5/weather";
-const GEO_REVERSE_API: &str = "http://api.openweathermap.org/geo/1.0/reverse";
+const GEO_REVERSE_API: &str = "https://api.openweathermap.org/geo/1.0/reverse";
 
 #[derive(Debug, Clone)]
-pub struct PlaceInfo {
+pub struct LocationInfo {
     pub city: String,
     pub country: String,
     pub lat: f64,
     pub lon: f64,
 }
 
-pub async fn get_city_info(lat: f64, lon: f64, api_key: &str) -> Result<PlaceInfo, ExitFailure> {
+pub async fn get_city_info(lat: f64, lon: f64, api_key: &str) -> Result<LocationInfo, ExitFailure> {
     println!("->> {:<12} - get_city_info", "OPENWEATHERMAP");
 
     let limit = 1;
@@ -28,7 +28,7 @@ pub async fn get_city_info(lat: f64, lon: f64, api_key: &str) -> Result<PlaceInf
     let resp = reqwest::get(url).await?.json::<CoordsVec>().await?;
     // dbg!(&resp);
 
-    Ok(PlaceInfo {
+    Ok(LocationInfo {
         city: resp[0].name.clone(),
         country: resp[0].country.clone(),
         lat,
@@ -40,7 +40,7 @@ pub async fn get_coords(
     city_name: &str,
     country_code: &str,
     api_key: &str,
-) -> Result<PlaceInfo, ExitFailure> {
+) -> Result<LocationInfo, ExitFailure> {
     println!("->> {:<12} - get_coords", "OPENWEATHERMAP");
 
     let state_code = "";
@@ -56,7 +56,7 @@ pub async fn get_coords(
     let resp = reqwest::get(url).await?.json::<CoordsVec>().await?;
     // dbg!(&resp);
 
-    Ok(PlaceInfo {
+    Ok(LocationInfo {
         city: city_name.to_string(),
         country: country_code.to_string(),
         lat: resp[0].lat,

@@ -11,14 +11,12 @@ pub struct Coord {
     pub lon: f64,
 }
 
-pub fn get_coord(api_key: &str) -> Coord {
+pub async fn get_coord(api_key: &str) -> Result<Coord, ExitFailure> {
     println!("->> {:<12} - get_coord", "IPGEOLOCATION");
 
     let ipaddr = get_ip();
-    let coord = get_coord_service(ipaddr, api_key);
-    let _a = block_on(coord).unwrap();
-
-    _a
+    let resp = get_coord_service(ipaddr, api_key).await?;
+    Ok(resp)
 }
 
 async fn get_coord_service(ip: IpAddr, api_key: &str) -> Result<Coord, ExitFailure> {

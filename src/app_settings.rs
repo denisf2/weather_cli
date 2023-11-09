@@ -24,3 +24,15 @@ pub async fn get_api_keys(path: &Path) -> Result<Settings, ExitFailure> {
 
     Ok(settings)
 }
+
+#[cfg(test)]
+mod tests{
+    // #[test]
+    // not valid path
+    // #[test]
+    // not valid file
+    // #[test]
+    // empty file
+    // #[test]
+    // missing json node
+}
