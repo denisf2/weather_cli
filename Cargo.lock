@@ -1098,6 +1098,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "simple-home-dir"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "509fcbd8f28460b50b91c057bbc479dc0257f470f94c4564beb38c22c19fdaae"
+dependencies = [
+ "windows-sys",
+]
+
+[[package]]
 name = "slab"
 version = "0.4.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1526,6 +1535,7 @@ dependencies = [
  "reqwest",
  "serde",
  "serde_json",
+ "simple-home-dir",
  "tokio",
 ]
 

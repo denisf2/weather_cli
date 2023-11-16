@@ -8,6 +8,10 @@ use clap::Parser;
 use exitfailure::ExitFailure;
 use ip2geo_client::api_wrapper::Coord;
 use owm_client::json_structs::Forecast;
+use simple_home_dir::*;
+
+const DEFAULT_CONFIG_PATH: &str = "~/.weather_cli";
+
 
 #[derive(Debug, Parser, Clone)]
 #[command(author, version, about, long_about = None)]
@@ -22,7 +26,7 @@ pub struct CliArgs {
 
     // The path to the file to read
     #[arg(short, long, value_name = "FILE")]
-    config: std::path::PathBuf,
+    config: Option<PathBuf>,
 
     // verbose flag
     #[arg(short, long)]
@@ -45,8 +49,26 @@ async fn main() -> Result<(), ExitFailure> {
     // get clap args
     let cli = CliArgs::parse();
 
-    if !cli.config.is_file() {
-        println!("File {} does not exist", cli.config.to_str().unwrap());
+    let conf_path = cli.clone().config.unwrap_or_else(|| {
+        let path = expand_tilde(DEFAULT_CONFIG_PATH).unwrap();
+        if cli.verbose {
+            println!(
+                "->> {:<12} - Using default config path: {}",
+                "CONFIGURE",
+                &path.to_str().unwrap()
+            );
+        }
+        path
+    });
+
+    if !conf_path.is_file() {
+        if cli.verbose {
+            println!(
+                "->> {:<12} - File {} does not exist",
+                "CONFIGURE",
+                conf_path.to_str().unwrap()
+            );
+        }
         return Ok(());
     }
 
