@@ -4,6 +4,8 @@ mod app_settings;
 mod ip2geo_client;
 mod owm_client;
 
+use std::path::PathBuf;
+
 use clap::Parser;
 use exitfailure::ExitFailure;
 use ip2geo_client::api_wrapper::Coord;
