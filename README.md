@@ -14,6 +14,7 @@ Options:
   -C, --city <CITY>
   -O, --country <COUNTRY>
   -c, --config <FILE>
+  -v, --verbose
   -h, --help               Print help
   -V, --version            Print version
 ```
