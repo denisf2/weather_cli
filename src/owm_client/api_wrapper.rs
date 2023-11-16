@@ -1,3 +1,5 @@
+use crate::CliArgs;
+
 use super::json_structs::{CoordsVec, Forecast};
 
 use exitfailure::ExitFailure;
@@ -15,8 +17,15 @@ pub struct LocationInfo {
     pub lon: f64,
 }
 
-pub async fn get_city_info(lat: f64, lon: f64, api_key: &str) -> Result<LocationInfo, ExitFailure> {
-    println!("->> {:<12} - get_city_info", "OPENWEATHERMAP");
+pub async fn get_city_info(
+    lat: f64,
+    lon: f64,
+    api_key: &str,
+    cli: &CliArgs,
+) -> Result<LocationInfo, ExitFailure> {
+    if cli.verbose {
+        println!("->> {:<12} - get_city_info", "OPENWEATHERMAP");
+    }
 
     let limit = 1;
     let url = format!("{GEO_REVERSE_API}?lat={lat}&lon={lon}&limit={limit}&appid={api_key}");
@@ -40,8 +49,11 @@ pub async fn get_coords(
     city_name: &str,
     country_code: &str,
     api_key: &str,
+    cli: &CliArgs,
 ) -> Result<LocationInfo, ExitFailure> {
-    println!("->> {:<12} - get_coords", "OPENWEATHERMAP");
+    if cli.verbose {
+        println!("->> {:<12} - get_coords", "OPENWEATHERMAP");
+    }
 
     let state_code = "";
     let limit = 3;
@@ -64,8 +76,14 @@ pub async fn get_coords(
     })
 }
 
-pub async fn get_forcast(coord: (f64, f64), api_key: &str) -> Result<Forecast, ExitFailure> {
-    println!("->> {:<12} - get_forcast", "OPENWEATHERMAP");
+pub async fn get_forcast(
+    coord: (f64, f64),
+    api_key: &str,
+    cli: &CliArgs,
+) -> Result<Forecast, ExitFailure> {
+    if cli.verbose {
+        println!("->> {:<12} - get_forcast", "OPENWEATHERMAP");
+    }
 
     let units = "metric";
     let url = format!(

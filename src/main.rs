@@ -11,7 +11,7 @@ use owm_client::json_structs::Forecast;
 
 #[derive(Debug, Parser, Clone)]
 #[command(author, version, about, long_about = None)]
-struct CliArgs {
+pub struct CliArgs {
     // City name
     #[arg(short = 'C', long)]
     city: Option<String>,
@@ -23,10 +23,16 @@ struct CliArgs {
     // The path to the file to read
     #[arg(short, long, value_name = "FILE")]
     config: std::path::PathBuf,
+
+    // verbose flag
+    #[arg(short, long)]
+    pub verbose: bool,
 }
 
-fn print_forecast(forecast: Forecast) {
-    println!("->> {:<12} - print_forecast", "OUTPUT");
+fn print_forecast(forecast: Forecast, cli: &CliArgs) {
+    if cli.verbose {
+        println!("->> {:<12} - print_forecast", "OUTPUT");
+    }
 
     println!(
         "Temperature in {} {} is {}°C",
@@ -44,30 +50,38 @@ async fn main() -> Result<(), ExitFailure> {
         return Ok(());
     }
 
-    let api_key = app_settings::get_api_keys(cli.config.as_path()).await?;
+    let api_key = app_settings::get_api_keys(&conf_path.as_path(), &cli).await?;
 
-    let coord = match (cli.city, cli.country) {
+    let coord = match (&cli.city, &cli.country) {
         (Some(c), Some(co)) => {
             // get coordinate by city / country
-            owm_client::api_wrapper::get_coords(c.as_str(), co.as_str(), api_key.owm_key.as_str())
-                .await?
+            owm_client::api_wrapper::get_coords(
+                c.as_str(),
+                co.as_str(),
+                api_key.owm_key.as_str(),
+                &cli,
+            )
+            .await?
         }
 
         (_, _) => {
             // condition key to find forecast by local ip
             let Coord { lat, lon } =
-                ip2geo_client::api_wrapper::get_coord(api_key.ip2geo_key.as_str()).await?;
-            owm_client::api_wrapper::get_city_info(lat, lon, &api_key.owm_key).await?
+                ip2geo_client::api_wrapper::get_coord(api_key.ip2geo_key.as_str(), &cli).await?;
+            owm_client::api_wrapper::get_city_info(lat, lon, &api_key.owm_key, &cli).await?
         }
     };
     // dbg!(&coord);
 
-    let forecast =
-        owm_client::api_wrapper::get_forcast((coord.lat, coord.lon), api_key.owm_key.as_str())
-            .await?;
+    let forecast = owm_client::api_wrapper::get_forcast(
+        (coord.lat, coord.lon),
+        api_key.owm_key.as_str(),
+        &cli,
+    )
+    .await?;
     // dbg!(&forecast);
 
-    print_forecast(forecast);
+    print_forecast(forecast, &cli);
 
     Ok(())
 }

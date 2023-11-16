@@ -5,7 +5,7 @@
 - [ ] unit tests
 - [ ] async api call's errors handling
 - [ ] debug mode
-- [ ] verbose mode
+- [x] verbose mode
 
 ### In progress
 

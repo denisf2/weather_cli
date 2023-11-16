@@ -1,3 +1,5 @@
+use crate::CliArgs;
+
 use super::json_structs::Root;
 use exitfailure::ExitFailure;
 use futures::executor::block_on;
@@ -11,16 +13,20 @@ pub struct Coord {
     pub lon: f64,
 }
 
-pub async fn get_coord(api_key: &str) -> Result<Coord, ExitFailure> {
-    println!("->> {:<12} - get_coord", "IPGEOLOCATION");
+pub async fn get_coord(api_key: &str, cli: &CliArgs) -> Result<Coord, ExitFailure> {
+    if cli.verbose {
+        println!("->> {:<12} - get_coord", "IPGEOLOCATION");
+    }
 
-    let ipaddr = get_ip();
-    let resp = get_coord_service(ipaddr, api_key).await?;
+    let ipaddr = get_ip(cli);
+    let resp = get_coord_service(ipaddr, api_key, cli).await?;
     Ok(resp)
 }
 
-async fn get_coord_service(ip: IpAddr, api_key: &str) -> Result<Coord, ExitFailure> {
-    println!("->> {:<12} - get_coord_service", "IPGEOLOCATION");
+async fn get_coord_service(ip: IpAddr, api_key: &str, cli: &CliArgs) -> Result<Coord, ExitFailure> {
+    if cli.verbose {
+        println!("->> {:<12} - get_coord_service", "IPGEOLOCATION");
+    }
 
     let url = format!("{IP2GEO_API}?apiKey={api_key}&ip={ip}");
     let url = Url::parse(&url)?;
@@ -32,8 +38,10 @@ async fn get_coord_service(ip: IpAddr, api_key: &str) -> Result<Coord, ExitFailu
     Ok(Coord { lat, lon })
 }
 
-fn get_ip() -> IpAddr {
-    println!("->> {:<12} - get_ip", "IPGEOLOCATION");
+fn get_ip(cli: &CliArgs) -> IpAddr {
+    if cli.verbose {
+        println!("->> {:<12} - get_ip", "IPGEOLOCATION");
+    }
 
     let result = external_ip::get_ip();
     let value: Option<IpAddr> = block_on(result);
