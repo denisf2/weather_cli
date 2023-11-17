@@ -19,19 +19,24 @@ const DEFAULT_CONFIG_PATH: &str = "~/.weather_cli";
 #[command(author, version, about, long_about = None)]
 pub struct CliArgs {
     // City name
-    #[arg(short = 'C', long)]
+    #[arg(short = 'C', long, help = "A city definition")]
     city: Option<String>,
 
     // Country
-    #[arg(short = 'O', long)]
+    #[arg(short = 'O', long, help = "Country of the city")]
     country: Option<String>,
 
     // The path to the file to read
-    #[arg(short, long, value_name = "FILE")]
+    #[arg(
+        short,
+        long,
+        value_name = "FILE",
+        help = "Path to the configuration file"
+    )]
     config: Option<PathBuf>,
 
     // verbose flag
-    #[arg(short, long)]
+    #[arg(short, long, help = "Verbose mode")]
     pub verbose: bool,
 }
 

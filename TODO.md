@@ -9,6 +9,7 @@
 
 ### Done ✓
 
-- [x] default config file's path  
-- [x] no argumets run detect your location by ip and default config file path  
-- [x] verbose mode  
+- [x] help description
+- [x] default config file's path
+- [x] no argumets run detect your location by ip and default config file path
+- [x] verbose mode
