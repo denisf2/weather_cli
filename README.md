@@ -20,8 +20,13 @@ Simple command line weather forecast tool
 ## Usage
 ```
 > ./weather_cli
+Temperature in Lappeenranta FI is -6.99°C
+
 > ./weather_cli -c ~/.weather_cli
+Temperature in Lappeenranta FI is -6.99°C
+
 > ./weather_cli --config ~/.weather_cli -C London -O GB
+Temperature in London GB is 4.21°C
 ```
 ```
 > ./weather_cli --help
