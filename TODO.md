@@ -3,6 +3,8 @@
 - [ ] unit tests  
 - [ ] async api call's errors handling  
 - [ ] debug mode  
+- [ ] forcast request for US, needs to point state  
+- [ ] refactor json structures name  
 
 ### In progress
 
