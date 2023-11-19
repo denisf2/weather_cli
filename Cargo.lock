@@ -1530,6 +1530,7 @@ dependencies = [
  "clap",
  "exitfailure",
  "external-ip",
+ "failure",
  "futures",
  "futures-executor",
  "reqwest",

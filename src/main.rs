@@ -1,5 +1,7 @@
 // #[warn(dead_code)]
 
+#[macro_use] extern crate failure;
+
 mod app_settings;
 mod ip2geo_client;
 mod owm_client;

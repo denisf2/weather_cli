@@ -1,9 +1,9 @@
 use crate::CliArgs;
 
-use super::json_structs::{CoordsVec, Forecast};
+use super::json_structs::{Forecast, ServiceRespond};
 
 use exitfailure::ExitFailure;
-use reqwest::Url;
+use reqwest::{Response, Url};
 
 const GEO_API: &str = "https://api.openweathermap.org/geo/1.0/direct";
 const WEATHER_API: &str = "https://api.openweathermap.org/data/2.5/weather";
@@ -26,23 +26,33 @@ pub async fn get_city_info(
     if cli.verbose {
         println!("->> {:<12} - get_city_info", "OPENWEATHERMAP");
     }
-
+    // send request
     let limit = 1;
     let url = format!("{GEO_REVERSE_API}?lat={lat}&lon={lon}&limit={limit}&appid={api_key}");
-    // dbg!(&url);
 
-    let url = Url::parse(&url)?;
-    // dbg!(&url);
+    let resp = send_request(url, cli).await?;
 
-    let resp = reqwest::get(url).await?.json::<CoordsVec>().await?;
+    // parse respond
+    let resp = resp.json::<ServiceRespond>().await?;
     // dbg!(&resp);
-
-    Ok(LocationInfo {
-        city: resp[0].name.clone(),
-        country: resp[0].country.clone(),
-        lat,
-        lon,
-    })
+    match resp {
+        ServiceRespond::Main(a) => {
+            // check vec size
+            let city = a[0].name.clone();
+            let country = a[0].country.clone();
+            Ok(LocationInfo {
+                city,
+                country,
+                lat,
+                lon,
+            })
+        }
+        ServiceRespond::Message(m) => Err(failure::err_msg(format!(
+            "Failed to parse json couse: {}",
+            m.message
+        )))?,
+        _ => Err(failure::err_msg("Failed to parse json"))?,
+    }
 }
 
 pub async fn get_coords(
@@ -54,26 +64,36 @@ pub async fn get_coords(
     if cli.verbose {
         println!("->> {:<12} - get_coords", "OPENWEATHERMAP");
     }
-
+    // send request
     let state_code = "";
     let limit = 3;
     let url = format!(
         "{GEO_API}?q={city_name},{state_code},{country_code}&limit={limit}&appid={api_key}"
     );
-    // dbg!(&url);
 
-    let url = Url::parse(&url)?;
-    // dbg!(&url);
+    let resp = send_request(url, cli).await?;
 
-    let resp = reqwest::get(url).await?.json::<CoordsVec>().await?;
+    // parse respond
+    let resp = resp.json::<ServiceRespond>().await?;
     // dbg!(&resp);
-
-    Ok(LocationInfo {
-        city: city_name.to_string(),
-        country: country_code.to_string(),
-        lat: resp[0].lat,
-        lon: resp[0].lon,
-    })
+    match resp {
+        ServiceRespond::Main(a) => {
+            // check vec size
+            let lat = a[0].lat;
+            let lon = a[0].lon;
+            Ok(LocationInfo {
+                city: city_name.to_string(),
+                country: country_code.to_string(),
+                lat,
+                lon,
+            })
+        }
+        ServiceRespond::Message(m) => Err(failure::err_msg(format!(
+            "Failed to parse json couse: {}",
+            m.message
+        )))?,
+        _ => Err(failure::err_msg("Failed to parse json"))?,
+    }
 }
 
 pub async fn get_forcast(
@@ -84,18 +104,36 @@ pub async fn get_forcast(
     if cli.verbose {
         println!("->> {:<12} - get_forcast", "OPENWEATHERMAP");
     }
-
+    // send request
     let units = "metric";
     let url = format!(
         "{WEATHER_API}?lat={}&lon={}&appid={api_key}&units={units}",
         coord.0, coord.1
     );
 
-    // dbg!(&url);
+    let resp = send_request(url, cli).await?;
+
+    // parse respond
+    let resp = resp.json::<ServiceRespond>().await?;
+    // dbg!(&resp);
+    match resp {
+        ServiceRespond::Secondery(a) => Ok(a),
+        ServiceRespond::Message(m) => Err(failure::err_msg(format!(
+            "Failed to parse json couse: {}",
+            m.message
+        )))?,
+        _ => Err(failure::err_msg("Failed to parse json"))?,
+    }
+}
+
+async fn send_request(url: String, cli: &CliArgs) -> Result<Response, failure::Error> {
+    if cli.verbose {
+        println!("->> {:<12} - send_request: {}", "OPENWEATHERMAP", &url);
+    }
+
     let url = Url::parse(&url)?;
     // dbg!(&url);
-    let resp = reqwest::get(url).await?.json::<Forecast>().await?;
-    // dbg!(&resp);
 
+    let resp = reqwest::get(url).await?;
     Ok(resp)
 }

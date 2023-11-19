@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Root {
@@ -71,4 +70,17 @@ pub struct TimeZone {
     pub is_dst: bool,
     #[serde(rename = "dst_savings")]
     pub dst_savings: i64,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ErrorMessage {
+    pub message: String,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum ServiceRespond {
+    Main(Root),
+    Message(ErrorMessage),
 }

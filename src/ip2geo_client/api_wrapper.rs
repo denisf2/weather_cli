@@ -1,6 +1,5 @@
+use super::json_structs::ServiceRespond;
 use crate::CliArgs;
-
-use super::json_structs::Root;
 use exitfailure::ExitFailure;
 use futures::executor::block_on;
 use reqwest::Url;
@@ -23,19 +22,37 @@ pub async fn get_coord(api_key: &str, cli: &CliArgs) -> Result<Coord, ExitFailur
     Ok(resp)
 }
 
-async fn get_coord_service(ip: IpAddr, api_key: &str, cli: &CliArgs) -> Result<Coord, ExitFailure> {
+async fn get_coord_service(
+    ip: IpAddr,
+    api_key: &str,
+    cli: &CliArgs,
+) -> Result<Coord, failure::Error> {
     if cli.verbose {
         println!("->> {:<12} - get_coord_service", "IPGEOLOCATION");
     }
-
+    // send request
     let url = format!("{IP2GEO_API}?apiKey={api_key}&ip={ip}");
+
+    if cli.verbose {
+        println!("->> {:<12} - Sending request: {}", "IPGEOLOCATION", &url);
+    }
     let url = Url::parse(&url)?;
 
-    let resp = reqwest::get(url).await?.json::<Root>().await?;
-    let lat = resp.latitude.as_str().parse::<f64>().unwrap();
-    let lon = resp.longitude.as_str().parse::<f64>().unwrap();
+    let resp = reqwest::get(url).await?;
 
-    Ok(Coord { lat, lon })
+    // parse respond
+    let resp = resp.json::<ServiceRespond>().await?;
+    match resp {
+        ServiceRespond::Main(a) => {
+            let lat = a.latitude.parse::<f64>()?;
+            let lon = a.longitude.parse::<f64>()?;
+            Ok(Coord { lat, lon })
+        }
+        ServiceRespond::Message(m) => Err(failure::err_msg(format!(
+            "Failed to parse json couse: {}",
+            m.message
+        ))),
+    }
 }
 
 fn get_ip(cli: &CliArgs) -> IpAddr {
@@ -44,10 +61,10 @@ fn get_ip(cli: &CliArgs) -> IpAddr {
     }
 
     let result = external_ip::get_ip();
-    let value: Option<IpAddr> = block_on(result);
+    let value = block_on(result).unwrap();
     // dbg!(&value);
 
-    value.unwrap()
+    value
 }
 
 // get geo coords by ip
