@@ -36,7 +36,7 @@ pub async fn get_city_info(
     let resp = resp.json::<ServiceRespond>().await?;
     // dbg!(&resp);
     match resp {
-        ServiceRespond::Main(a) => {
+        ServiceRespond::DataCoord(a) => {
             // check vec size
             let city = a[0].name.clone();
             let country = a[0].country.clone();
@@ -47,7 +47,7 @@ pub async fn get_city_info(
                 lon,
             })
         }
-        ServiceRespond::Message(m) => Err(failure::err_msg(format!(
+        ServiceRespond::Error(m) => Err(failure::err_msg(format!(
             "Failed to parse json couse: {}",
             m.message
         )))?,
@@ -77,7 +77,7 @@ pub async fn get_coords(
     let resp = resp.json::<ServiceRespond>().await?;
     // dbg!(&resp);
     match resp {
-        ServiceRespond::Main(a) => {
+        ServiceRespond::DataCoord(a) => {
             // check vec size
             let lat = a[0].lat;
             let lon = a[0].lon;
@@ -88,7 +88,7 @@ pub async fn get_coords(
                 lon,
             })
         }
-        ServiceRespond::Message(m) => Err(failure::err_msg(format!(
+        ServiceRespond::Error(m) => Err(failure::err_msg(format!(
             "Failed to parse json couse: {}",
             m.message
         )))?,
@@ -117,8 +117,8 @@ pub async fn get_forcast(
     let resp = resp.json::<ServiceRespond>().await?;
     // dbg!(&resp);
     match resp {
-        ServiceRespond::Secondery(a) => Ok(a),
-        ServiceRespond::Message(m) => Err(failure::err_msg(format!(
+        ServiceRespond::DataWthr(a) => Ok(a),
+        ServiceRespond::Error(m) => Err(failure::err_msg(format!(
             "Failed to parse json couse: {}",
             m.message
         )))?,

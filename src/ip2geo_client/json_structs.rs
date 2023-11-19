@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Root {
+pub struct Location {
     pub ip: String,
     #[serde(rename = "continent_code")]
     pub continent_code: String,
@@ -74,13 +74,13 @@ pub struct TimeZone {
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct ErrorMessage {
+pub struct Message {
     pub message: String,
 }
 
 #[derive(Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum ServiceRespond {
-    Main(Root),
-    Message(ErrorMessage),
+    Data(Location),
+    Error(Message),
 }

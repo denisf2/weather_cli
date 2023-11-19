@@ -43,12 +43,12 @@ async fn get_coord_service(
     // parse respond
     let resp = resp.json::<ServiceRespond>().await?;
     match resp {
-        ServiceRespond::Main(a) => {
+        ServiceRespond::Data(a) => {
             let lat = a.latitude.parse::<f64>()?;
             let lon = a.longitude.parse::<f64>()?;
             Ok(Coord { lat, lon })
         }
-        ServiceRespond::Message(m) => Err(failure::err_msg(format!(
+        ServiceRespond::Error(m) => Err(failure::err_msg(format!(
             "Failed to parse json couse: {}",
             m.message
         ))),

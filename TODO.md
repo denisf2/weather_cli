@@ -4,13 +4,13 @@
 - [ ] async api call's errors handling  
 - [ ] debug mode  
 - [ ] forcast request for US, needs to point state  
-- [ ] refactor json structures name  
 
 ### In progress
 
 
 ### Done ✓
 
+- [x] refactor json structures name  
 - [x] services bad request result json handling  
 - [x] help description  
 - [x] default config file's path  

@@ -1,11 +1,11 @@
 use serde::{Deserialize, Serialize};
 
 /// get coordinates
-pub type CoordsVec = Vec<CityCoord>;
+pub type CoordsVec = Vec<CityInfo>;
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct CityCoord {
+pub struct CityInfo {
     pub name: String,
     #[serde(rename = "local_names")]
     pub local_names: Option<LocalNames>,
@@ -257,7 +257,7 @@ pub struct Sys {
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct ErrorMessage {
+pub struct Message {
     code: i64,
     pub message: String,
 }
@@ -265,7 +265,7 @@ pub struct ErrorMessage {
 #[derive(Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum ServiceRespond {
-    Main(CoordsVec),
-    Secondery(Forecast),
-    Message(ErrorMessage),
+    DataCoord(CoordsVec),
+    DataWthr(Forecast),
+    Error(Message),
 }
