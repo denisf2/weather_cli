@@ -266,6 +266,6 @@ pub struct Message {
 #[serde(untagged)]
 pub enum ServiceRespond {
     DataCoord(CoordsVec),
-    DataWthr(Forecast),
+    DataWthr(Box<Forecast>),
     Error(Message),
 }

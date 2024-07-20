@@ -81,6 +81,6 @@ pub struct Message {
 #[derive(Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum ServiceRespond {
-    Data(Location),
+    Data(Box<Location>),
     Error(Message),
 }

@@ -1,4 +1,4 @@
-use crate::CliArgs;
+use crate::cli_arguments::CliArgs;
 
 use super::json_structs::{Forecast, ServiceRespond};
 
@@ -100,7 +100,7 @@ pub async fn get_forcast(
     coord: (f64, f64),
     api_key: &str,
     cli: &CliArgs,
-) -> Result<Forecast, ExitFailure> {
+) -> Result<Box<Forecast>, ExitFailure> {
     if cli.verbose {
         println!("->> {:<12} - get_forcast", "OPENWEATHERMAP");
     }

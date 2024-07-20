@@ -1,5 +1,5 @@
 use super::json_structs::ServiceRespond;
-use crate::CliArgs;
+use crate::cli_arguments::CliArgs;
 use exitfailure::ExitFailure;
 use futures::executor::block_on;
 use reqwest::Url;
@@ -61,10 +61,7 @@ fn get_ip(cli: &CliArgs) -> IpAddr {
     }
 
     let result = external_ip::get_ip();
-    let value = block_on(result).unwrap();
-    // dbg!(&value);
-
-    value
+    block_on(result).unwrap()
 }
 
 // get geo coords by ip

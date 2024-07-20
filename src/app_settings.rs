@@ -1,10 +1,9 @@
+use crate::cli_arguments::CliArgs;
 use exitfailure::ExitFailure;
 use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
-
-use crate::CliArgs;
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -20,7 +19,7 @@ pub async fn get_api_keys(path: &Path, cli: &CliArgs) -> Result<Settings, ExitFa
         println!("->> {:<12} - get_api_keys", "SETTINGS");
     }
 
-    let mut file = File::open(&path)?;
+    let mut file = File::open(path)?;
     let mut data = String::new();
     let _ = file.read_to_string(&mut data)?;
 
